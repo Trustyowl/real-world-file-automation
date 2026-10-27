@@ -1,0 +1,35 @@
+from pathlib import Path
+import shutil
+
+TEST_FOLDER = Path(r"C:\Automation-Test")
+
+FILE_CATEGORIES = {
+    ".pdf": "Documents",
+    ".docx": "Documents",
+    ".txt": "Documents",
+    ".xlsx": "Spreadsheets",
+    ".csv": "Spreadsheets",
+    ".jpg": "Images",
+    ".jpeg": "Images",
+    ".png": "Images",
+    ".zip": "Archives",
+    ".mp4": "Videos",
+    ".mp3": "Audio",
+    ".exe": "Applications"
+}
+
+for file_path in TEST_FOLDER.iterdir():
+    if file_path.is_file():
+        category = FILE_CATEGORIES.get(
+            file_path.suffix.lower(),
+            "Other"
+        )
+
+        destination_folder = TEST_FOLDER / category
+        destination_folder.mkdir(exist_ok=True)
+
+        destination = destination_folder / file_path.name
+
+        shutil.move(str(file_path), str(destination))
+
+        print(f"Moved: {file_path.name} -> {category}")
