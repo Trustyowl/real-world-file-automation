@@ -20,10 +20,13 @@ FILE_CATEGORIES = {
 
 for file_path in TEST_FOLDER.iterdir():
     if file_path.is_file():
-        category = FILE_CATEGORIES.get(
-            file_path.suffix.lower(),
-            "Other"
-        )
+
+        extension = file_path.suffix.lower()
+
+        category = FILE_CATEGORIES.get(extension, "Other")
+
+        if category == "Other":
+            print(f"Unknown file type: {file_path.name}")
 
         destination_folder = TEST_FOLDER / category
         destination_folder.mkdir(exist_ok=True)
