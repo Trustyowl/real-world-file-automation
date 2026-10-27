@@ -35,25 +35,26 @@ def get_unique_destination(destination):
         counter += 1
 
 for file_path in TEST_FOLDER.iterdir():
-    if file_path.is_file():
+    try:
+        if file_path.is_file():
 
-        extension = file_path.suffix.lower()
+            extension = file_path.suffix.lower()
+            category = FILE_CATEGORIES.get(extension, "Other")
 
-        category = FILE_CATEGORIES.get(extension, "Other")
+            if category == "Other":
+                print(f"Unknown file type: {file_path.name}")
 
-        if category == "Other":
-            print(f"Unknown file type: {file_path.name}")
+            destination_folder = TEST_FOLDER / category
+            destination_folder.mkdir(exist_ok=True)
 
-        destination_folder = TEST_FOLDER / category
-        destination_folder.mkdir(exist_ok=True)
+            destination = destination_folder / file_path.name
+            destination = get_unique_destination(destination)
 
-        destination = destination_folder / file_path.name
-	destination = get_unique_destination(destination)
+            if DRY_RUN:
+                print(f"Would move: {file_path.name} -> {category}")
+            else:
+                shutil.move(str(file_path), str(destination))
+                print(f"Moved: {file_path.name} -> {category}")
 
-        if DRY_RUN:
-    print(f"Would move: {file_path.name} -> {category}")
-	else:
-    shutil.move(str(file_path), str(destination))
-    print(f"Moved: {file_path.name} -> {category}")
-
-     print(f"Moved: {file_path.name} -> {category}")
+    except Exception as error:
+        print(f"Error processing {file_path.name}: {error}")
