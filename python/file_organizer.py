@@ -1,5 +1,6 @@
 from pathlib import Path
 import shutil
+DRY_RUN = True
 
 TEST_FOLDER = Path(r"C:\Automation-Test")
 
@@ -49,6 +50,10 @@ for file_path in TEST_FOLDER.iterdir():
         destination = destination_folder / file_path.name
 	destination = get_unique_destination(destination)
 
-        shutil.move(str(file_path), str(destination))
+        if DRY_RUN:
+    print(f"Would move: {file_path.name} -> {category}")
+	else:
+    shutil.move(str(file_path), str(destination))
+    print(f"Moved: {file_path.name} -> {category}")
 
-        print(f"Moved: {file_path.name} -> {category}")
+     print(f"Moved: {file_path.name} -> {category}")
