@@ -18,6 +18,21 @@ FILE_CATEGORIES = {
     ".exe": "Applications"
 }
 
+def get_unique_destination(destination):
+    if not destination.exists():
+        return destination
+
+    counter = 1
+
+    while True:
+        new_name = f"{destination.stem}_{counter}{destination.suffix}"
+        new_destination = destination.parent / new_name
+
+        if not new_destination.exists():
+            return new_destination
+
+        counter += 1
+
 for file_path in TEST_FOLDER.iterdir():
     if file_path.is_file():
 
@@ -32,6 +47,7 @@ for file_path in TEST_FOLDER.iterdir():
         destination_folder.mkdir(exist_ok=True)
 
         destination = destination_folder / file_path.name
+	destination = get_unique_destination(destination)
 
         shutil.move(str(file_path), str(destination))
 
