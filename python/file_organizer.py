@@ -1,149 +1,41 @@
 from pathlib import Path
 import csv
-from datetime import datetime
-import shutil
+from collections import Counter
 
-DRY_RUN = True
-
-TEST_FOLDER = Path(r"C:\Automation-Test")
 LOG_FILE = Path(
     r"C:\Real-World-File-Automation\logs\file_activity.csv"
 )
 
-FILE_CATEGORIES = {
-    ".pdf": "Documents",
-    ".docx": "Documents",
-    ".txt": "Documents",
-    ".xlsx": "Spreadsheets",
-    ".csv": "Spreadsheets",
-    ".jpg": "Images",
-    ".jpeg": "Images",
-    ".png": "Images",
-    ".zip": "Archives",
-    ".mp4": "Videos",
-    ".mp3": "Audio",
-    ".exe": "Applications"
-}
+REPORT_FILE = Path(
+    r"C:\Real-World-File-Automation\reports\weekly_report.txt"
+)
 
+category_counts = Counter()
+status_counts = Counter()
+total_files = 0
 
-def get_unique_destination(destination):
-    if not destination.exists():
-        return destination
+with open(LOG_FILE, newline="", encoding="utf-8") as file:
+    reader = csv.DictReader(file)
 
-    counter = 1
+    for row in reader:
+        total_files += 1
+        category_counts[row["category"]] += 1
+        status_counts[row["status"]] += 1
 
-    while True:
-        new_name = (
-            f"{destination.stem}_{counter}{destination.suffix}"
-        )
+REPORT_FILE.parent.mkdir(exist_ok=True)
 
-        new_destination = destination.parent / new_name
+with open(REPORT_FILE, "w", encoding="utf-8") as report:
+    report.write("WEEKLY FILE ORGANIZATION REPORT\n")
+    report.write("=" * 32 + "\n\n")
 
-        if not new_destination.exists():
-            return new_destination
+    report.write(f"Total files processed: {total_files}\n\n")
 
-        counter += 1
+    report.write("Files by category:\n")
+    for category, count in category_counts.items():
+        report.write(f"- {category}: {count}\n")
 
+    report.write("\nStatus summary:\n")
+    for status, count in status_counts.items():
+        report.write(f"- {status}: {count}\n")
 
-def log_action(
-    filename,
-    extension,
-    source,
-    destination,
-    category,
-    status
-):
-    LOG_FILE.parent.mkdir(exist_ok=True)
-
-    file_exists = LOG_FILE.exists()
-
-    with open(
-        LOG_FILE,
-        "a",
-        newline="",
-        encoding="utf-8"
-    ) as file:
-
-        writer = csv.writer(file)
-
-        if not file_exists:
-            writer.writerow([
-                "timestamp",
-                "filename",
-                "extension",
-                "source",
-                "destination",
-                "category",
-                "status"
-            ])
-
-        writer.writerow([
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            filename,
-            extension,
-            source,
-            destination,
-            category,
-            status
-        ])
-
-
-for file_path in TEST_FOLDER.iterdir():
-    try:
-        if file_path.is_file():
-
-            extension = file_path.suffix.lower()
-
-            category = FILE_CATEGORIES.get(
-                extension,
-                "Other"
-            )
-
-            if category == "Other":
-                print(
-                    f"Unknown file type: {file_path.name}"
-                )
-
-            destination_folder = TEST_FOLDER / category
-            destination_folder.mkdir(exist_ok=True)
-
-            destination = destination_folder / file_path.name
-            destination = get_unique_destination(destination)
-
-            if DRY_RUN:
-                print(
-                    f"Would move: {file_path.name} -> {category}"
-                )
-
-                log_action(
-                    file_path.name,
-                    extension,
-                    str(file_path),
-                    str(destination),
-                    category,
-                    "Dry Run"
-                )
-
-            else:
-                shutil.move(
-                    str(file_path),
-                    str(destination)
-                )
-
-                print(
-                    f"Moved: {file_path.name} -> {category}"
-                )
-
-                log_action(
-                    file_path.name,
-                    extension,
-                    str(file_path),
-                    str(destination),
-                    category,
-                    "Moved"
-                )
-
-    except Exception as error:
-        print(
-            f"Error processing {file_path.name}: {error}"
-        )
+print("Weekly report created successfully.")
