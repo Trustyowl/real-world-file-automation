@@ -22,6 +22,11 @@ with open(LOG_FILE, newline="", encoding="utf-8") as file:
         category_counts[row["category"]] += 1
         status_counts[row["status"]] += 1
 
+most_common_category = None
+
+if category_counts:
+    most_common_category = category_counts.most_common(1)[0]
+
 REPORT_FILE.parent.mkdir(exist_ok=True)
 
 with open(REPORT_FILE, "w", encoding="utf-8") as report:
@@ -31,11 +36,30 @@ with open(REPORT_FILE, "w", encoding="utf-8") as report:
     report.write(f"Total files processed: {total_files}\n\n")
 
     report.write("Files by category:\n")
+
     for category, count in category_counts.items():
         report.write(f"- {category}: {count}\n")
 
     report.write("\nStatus summary:\n")
+
     for status, count in status_counts.items():
         report.write(f"- {status}: {count}\n")
+
+    if most_common_category:
+        report.write(
+            f"\nMost common category: "
+            f"{most_common_category[0]} "
+            f"({most_common_category[1]} files)\n"
+        )
+
+    report.write(
+        f"\nSuccessful moves: "
+        f"{status_counts.get('Moved', 0)}\n"
+    )
+
+    report.write(
+        f"Dry-run actions: "
+        f"{status_counts.get('Dry Run', 0)}\n"
+    )
 
 print("Weekly report created successfully.")
