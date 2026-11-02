@@ -4,9 +4,6 @@ from datetime import datetime
 import shutil
 import json
 
-DRY_RUN = True
-
-TEST_FOLDER = Path(r"C:\Automation-Test")
 
 LOG_FILE = Path(
     r"C:\Real-World-File-Automation\logs\file_activity.csv"
@@ -124,3 +121,13 @@ for file_path in TEST_FOLDER.iterdir():
 
     except Exception as error:
         print(f"Error processing {file_path.name}: {error}")
+
+SETTINGS_FILE = Path(
+    r"C:\Real-World-File-Automation\config\settings.json"
+)
+
+with open(SETTINGS_FILE, "r", encoding="utf-8") as file:
+    settings = json.load(file)
+
+DRY_RUN = settings["dry_run"]
+TEST_FOLDER = Path(settings["test_folder"])
