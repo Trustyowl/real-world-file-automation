@@ -4,7 +4,6 @@ from datetime import datetime
 import shutil
 import json
 
-
 LOG_FILE = Path(
     r"C:\Real-World-File-Automation\logs\file_activity.csv"
 )
@@ -13,8 +12,18 @@ CONFIG_FILE = Path(
     r"C:\Real-World-File-Automation\config\file_categories.json"
 )
 
+SETTINGS_FILE = Path(
+    r"C:\Real-World-File-Automation\config\settings.json"
+)
+
 with open(CONFIG_FILE, "r", encoding="utf-8") as file:
     FILE_CATEGORIES = json.load(file)
+
+with open(SETTINGS_FILE, "r", encoding="utf-8") as file:
+    settings = json.load(file)
+
+DRY_RUN = settings["dry_run"]
+TEST_FOLDER = Path(settings["test_folder"])
 
 
 def get_unique_destination(destination):
@@ -121,13 +130,3 @@ for file_path in TEST_FOLDER.iterdir():
 
     except Exception as error:
         print(f"Error processing {file_path.name}: {error}")
-
-SETTINGS_FILE = Path(
-    r"C:\Real-World-File-Automation\config\settings.json"
-)
-
-with open(SETTINGS_FILE, "r", encoding="utf-8") as file:
-    settings = json.load(file)
-
-DRY_RUN = settings["dry_run"]
-TEST_FOLDER = Path(settings["test_folder"])
