@@ -1,2 +1,2 @@
-# No external Python packages required.
-# This project uses only Python standard library modules.
+# Python 3.10+; no third-party runtime or test dependencies.
+# Tests use the standard-library unittest runner.
