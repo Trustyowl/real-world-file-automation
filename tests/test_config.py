@@ -21,7 +21,8 @@ class ConfigTests(unittest.TestCase):
 
     def test_relative_paths_and_normalization(self):
         folder, dry_run, categories = organizer.load_config(self.settings, self.categories)
-        self.assertEqual(folder, self.root / 'inbox')
+        # Windows temporary paths may contain an 8.3 alias such as RUNNER~1.
+        self.assertEqual(folder, (self.root / 'inbox').resolve())
         self.assertTrue(dry_run)
         self.assertEqual(categories, {'.pdf': 'Documents'})
 
